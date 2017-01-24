@@ -1,2 +1,6 @@
 #pdf files
 *.pdf
+
+# Compiled python files and cache
+__pycache__/
+*.pyc
