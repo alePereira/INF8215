@@ -1,2 +1,2 @@
-class RushHour():
+class RushHour(object):
     pass

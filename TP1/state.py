@@ -1,5 +1,5 @@
 
-class State:
+class State(object):
 
     def __init__(self, state=None, c=0, d=0, p=None, rhInstance=None):
 
