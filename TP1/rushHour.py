@@ -1,13 +1,13 @@
 from priorityQueue import PriorityQueue
 from state import State
 
+
 class RushHour(object):
     
     def __init__(self):
         """
             definition de la grille
         """
-
         self.nbcars = 0
         self.color = []
         self.horiz = []
@@ -29,9 +29,8 @@ class RushHour(object):
                 for j in range(self.len[i]):
                     self.free[x+j][y] = False
 
-
     def moves(self, state):
-        initFree(state)
+        self.initFree(state)
         l = []
         for i in range(self.nbcars):
             if self.horiz[i]:
@@ -71,7 +70,7 @@ class RushHour(object):
     def solveAstar(self,state):
         visited = set()
         visited.add(state)
-        q = priorityQueue.PriorityQueue()
+        q = PriorityQueue()
         # TODO
         print("Pas de solution")
         return None
