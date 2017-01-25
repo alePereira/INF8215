@@ -25,14 +25,14 @@ class RushHour(object):
         return l
 
     def solve(self,state):
-        visited = [state]
+        visited = {state}
         q = []
         # TODO
         print("pas de solution")
         return None
     
     def solveAstar(self,state):
-        visited = [state]
+        visited = {state}
         q = priorityQueue.PriorityQueue()
         # TODO
         print("pas de solution")
