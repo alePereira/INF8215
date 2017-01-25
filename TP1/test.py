@@ -69,7 +69,7 @@ def test2():
     rh.nbcars = 8
     rh.horiz = [True, True, False, False, True, True, False, False]
     rh.len = [2, 2, 3, 2, 3, 2, 3, 3 ]
-    rh.moveon = [2, 0, 0, 0, 5, 4, 5, 3 ]
+    rh.moveOn = [2, 0, 0, 0, 5, 4, 5, 3 ]
     s = State(p=[1, 0, 1, 4, 2, 4, 0, 1], rhInstance=rh)
     rh.initFree(s)
     b = True
@@ -89,7 +89,7 @@ def test3():
     rh.nbcars = 12
     rh.horiz = [ True, False, True, False, False, True, False, True, False, True, False, True ]
     rh.len = [2, 2, 3, 2, 3, 2, 2, 2, 2, 2, 2, 3]
-    rh.moveon = [2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5]
+    rh.moveOn = [2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5]
     s =  State(p=[1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 1 ], rhInstance=rh)
     s2 = State(p=[1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 2 ], rhInstance=rh)
     print(len(rh.moves(s)))
@@ -103,10 +103,12 @@ def test4():
             "violet", "vert", "noir", "beige", "bleu" ]
     rh.horiz = [True, False, True, False, False, True, False, True, False, True, False, True ]
     rh.len = [2, 2, 3, 2, 3, 2, 2, 2, 2, 2, 2, 3]
-    rh.moveon = [2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5 ]
+    rh.moveOn = [2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5 ]
     s =  State(p = [1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 1], rhInstance=rh)
     n = 0
     s = rh.solve(s)
+    if s is None:
+        return
     while(s.prev != None):
         n+=1
         s = s.prev
@@ -119,7 +121,7 @@ def solve22():
             "violet", "vert", "noir", "beige", "bleu" ]
     rh.horiz = [ True, False, True, False, False, True, False, True, False, True, False, True ]
     rh.len = [ 2, 2, 3, 2, 3, 2, 2, 2, 2, 2, 2, 3 ]
-    rh.moveon = [ 2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5 ]
+    rh.moveOn = [ 2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5 ]
     s = State(p=[1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 1 ], rhInstance=rh)
     s = rh.solve(s)
     rh.printSolution(s)
@@ -131,7 +133,7 @@ def solve1():
     rh.color = ["rouge", "vert clair", "violet", "orange", "vert", "bleu ciel", "jaune", "bleu" ]
     rh.horiz = [ True, True, False, False, True, True, False, False ]
     rh.len =[ 2, 2, 3, 2, 3, 2, 3, 3 ]
-    rh.moveon = [ 2, 0, 0, 0, 5, 4, 5, 3 ]
+    rh.moveOn = [ 2, 0, 0, 0, 5, 4, 5, 3 ]
     s = State(p=[ 1, 0, 1, 4, 2, 4, 0, 1 ], rhInstance=rh)
     s = rh.solve(s)
     rh.printSolution(s)
@@ -144,7 +146,7 @@ def solve40():
     rh.horiz = [ True, False, True, False, False, False, False, True, False, False, True, True,
             True ]
     rh.len =  [ 2, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2 ]
-    rh.moveon =  [ 2, 0, 0, 4, 1, 2, 5, 3, 3, 2, 4, 5, 5 ]
+    rh.moveOn =  [ 2, 0, 0, 4, 1, 2, 5, 3, 3, 2, 4, 5, 5 ]
     s = State(p=[ 3, 0, 1, 0, 1, 1, 1, 0, 3, 4, 4, 0, 3 ], rhInstance=rh)
     s = rh.solve(s)
     rh.printSolution(s)
@@ -156,7 +158,7 @@ def solveAstar():
             "violet", "vert", "noir", "beige", "bleu" ]
     rh.horiz = [ True, False, True, False, False, True, False, True, False, True, False, True ]
     rh.len = [ 2, 2, 3, 2, 3, 2, 2, 2, 2, 2, 2, 3 ]
-    rh.moveon = [ 2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5 ]
+    rh.moveOn = [ 2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5 ]
     s = State(p=[ 1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 1 ], rhInstance=rh)
     s = rh.solveAstar(s)
     rh.printSolution(s)

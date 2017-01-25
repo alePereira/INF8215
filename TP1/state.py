@@ -47,7 +47,7 @@ class State(object):
 
     def __hash__(self):
         h = 0
-        for value in pos:
+        for value in self.pos:
             h = 37 * h + value
         return h
 
