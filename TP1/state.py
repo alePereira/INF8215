@@ -8,7 +8,7 @@ class State(object):
         if state is None:
             self.n = 0
             self.pos = p[:]
-            self.prev = 0
+            self.prev = None
             self.rh = rhInstance
         else:
             self.prev = state
@@ -39,6 +39,8 @@ class State(object):
         return 0
 
     def __eq__(self, other):
+        if other is None:
+            return False
         if len(self.pos) != len(other.pos):
             print("Les états n'ont pas le même nombre de voitures")
 
