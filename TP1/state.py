@@ -50,3 +50,35 @@ class State(object):
         for value in pos:
             h = 37 * h + value
         return h
+
+    def __repr__(self):
+        res = [['.' for i in range(6)] for j in range(6)]
+        for i in range(self.rh.nbcars):
+            if self.rh.horiz[i]:
+                x = self.rh.moveOn[i]
+                y = self.pos[i]
+                for j in range(self.rh.len[i]):
+                    res[x][y+j] = str(i)
+            else:
+                y = self.rh.moveOn[i]
+                x = self.pos[i]
+                for j in range(self.rh.len[i]):
+                    res[x+j][y] = str(i)
+
+        return ''.join([''.join(res[i]+["\n"]) for i in range(6)])
+
+
+# Test code
+if __name__ == '__main__':
+
+    class RushHour(object):
+        def __init__(self):
+            self.nbcars = 8
+            self.horiz = [True, True, False, False, True, True, False, False]
+            self.len = [2, 2, 3, 2, 3, 2, 3, 3 ]
+            self.moveOn = [2, 0, 0, 0, 5, 4, 5, 3 ]
+            
+
+    
+    s = State(p=[1, 0, 1, 4, 2, 4, 0, 1], rhInstance=RushHour())
+    print(s)
