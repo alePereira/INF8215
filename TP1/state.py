@@ -1,4 +1,3 @@
-
 class State(object):
 
     def __init__(self, state=None, c=0, d=0, p=None, rhInstance=None):
@@ -18,6 +17,7 @@ class State(object):
 
         self.c = c
         self.d = d
+        self.pos[c] += d
 
         """
             A utiliser dans la deuxième partie, 
@@ -28,8 +28,7 @@ class State(object):
         self.f = 0
 
     def success(self):
-        # TODO
-        return False
+        return self.pos[0] == 4
 
     def estimee1(self):
         # TODO
