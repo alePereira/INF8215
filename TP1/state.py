@@ -10,33 +10,28 @@ class State(object):
             self.pos = p[:]
             self.prev = None
             self.rh = rhInstance
+            self.n = 0
         else:
             self.prev = state
             self.pos = state.pos[:]
             self.rh = state.rh
+            self.n = state.n + 1
 
         self.c = c
         self.d = d
         self.pos[c] += d
-
-        """
-            A utiliser dans la deuxième partie, 
-            n indique la distance entre l'état
-            actuel et l'état initial, f le coût de l'état actuel.
-        """
-        self.n = 0
-        self.f = 0
+        self.f = self.estimee2()
 
     def success(self):
         return self.pos[0] == 4
 
     def estimee1(self):
-        # TODO
-        return 0
+        return 5 - self.pos[0]
 
     def estimee2(self):
-        # TODO
-        return 0
+        if self.rh is None:
+            return 0
+        return self.estimee1() + self.rh.numberOfCarsBlocking(self)
 
     def __eq__(self, other):
         if other is None:
@@ -72,14 +67,15 @@ class State(object):
 # Test code
 if __name__ == '__main__':
 
-    class RushHour(object):
-        def __init__(self):
-            self.nbcars = 8
-            self.horiz = [True, True, False, False, True, True, False, False]
-            self.len = [2, 2, 3, 2, 3, 2, 3, 3 ]
-            self.moveOn = [2, 0, 0, 0, 5, 4, 5, 3 ]
-            
+    from rushHour import RushHour
 
+    rh = RushHour()
+    rh.nbcars = 8
+    rh.horiz = [True, True, False, False, True, True, False, False]
+    rh.len = [2, 2, 3, 2, 3, 2, 3, 3 ]
+    rh.moveOn = [2, 0, 0, 0, 5, 4, 5, 3 ]
     
-    s = State(p=[1, 0, 1, 4, 2, 4, 0, 1], rhInstance=RushHour())
+    s = State(p=[1, 0, 1, 4, 2, 4, 0, 1], rhInstance=rh)
     print(s)
+    print(s.estimee1())
+    print(s.estimee2())

@@ -1,5 +1,6 @@
 from priorityQueue import PriorityQueue
 from state import State
+import time
 
 
 class RushHour(object):
@@ -14,6 +15,21 @@ class RushHour(object):
         self.len = []
         self.moveOn = []
         self.free = [[True] * 6 for _ in range(6)]
+
+    def numberOfCarsBlocking(self, state):
+        free = [[True] * 6 for _ in range(6)]
+        for i in range(self.nbcars):
+            if self.horiz[i]:
+                x = self.moveOn[i]
+                y = state.pos[i]
+                for j in range(self.len[i]):
+                    free[x][y+j] = False
+            else:
+                y = self.moveOn[i]
+                x = state.pos[i]
+                for j in range(self.len[i]):
+                    free[x+j][y] = False
+        return len([x for x in free[1][state.pos[0]+self.len[0]-1:] if not x])
 
     def initFree(self, state):
         self.free = [[True] * 6 for _ in range(6)]
@@ -58,12 +74,13 @@ class RushHour(object):
         while q:
             curr = q.pop(0)
             if curr.success():
+                print("Nombre d'états visités : " + str(len(visited)))
                 return curr
             nexts = self.moves(curr)
-            for state in nexts:
-                if not state in visited:
-                    q.append(state)
-                visited.add(state)
+            for s in nexts:
+                if not s in visited:
+                    q.append(s)
+                visited.add(s)
         print("Pas de solution")
         return None
     
@@ -71,7 +88,19 @@ class RushHour(object):
         visited = set()
         visited.add(state)
         q = PriorityQueue()
-        # TODO
+        initialMoves = self.moves(state)
+        for s in initialMoves:
+            q.enqueue(s, s.f)
+        while q:
+            curr = q.dequeue()
+            if curr.success():
+                print("Nombre d'états visités : " + str(len(visited)))
+                return curr
+            nexts = self.moves(curr)
+            for s in nexts:
+                if not s in visited:
+                    q.enqueue(s, s.f)
+                visited.add(s)
         print("Pas de solution")
         return None
 
