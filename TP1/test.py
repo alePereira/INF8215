@@ -136,7 +136,7 @@ def solve1():
     rh.moveOn = [ 2, 0, 0, 0, 5, 4, 5, 3 ]
     s = State(p=[ 1, 0, 1, 4, 2, 4, 0, 1 ], rhInstance=rh)
     s = rh.solve(s)
-    rh.printSolution(s)
+    rh.printAnimatedAsciiSolution(s)
 
 def solve40():
     rh = RushHour()

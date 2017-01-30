@@ -54,12 +54,12 @@ class State(object):
                 x = self.rh.moveOn[i]
                 y = self.pos[i]
                 for j in range(self.rh.len[i]):
-                    res[x][y+j] = str(i)
+                    res[x][y+j] = chr(ord('a') + i)
             else:
                 y = self.rh.moveOn[i]
                 x = self.pos[i]
                 for j in range(self.rh.len[i]):
-                    res[x+j][y] = str(i)
+                    res[x+j][y] = chr(ord('a') + i)
 
         return ''.join([''.join(res[i]+["\n"]) for i in range(6)])
 

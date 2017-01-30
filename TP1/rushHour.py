@@ -68,6 +68,7 @@ class RushHour(object):
         return l
 
     def solve(self,state):
+        start = time.time()
         visited = set()
         visited.add(state)
         q = self.moves(state)
@@ -75,6 +76,7 @@ class RushHour(object):
             curr = q.pop(0)
             if curr.success():
                 print("Nombre d'états visités : " + str(len(visited)))
+                print("Temps écoulé : " + '%.3f' % (time.time() - start) + 's')
                 return curr
             nexts = self.moves(curr)
             for s in nexts:
@@ -85,6 +87,7 @@ class RushHour(object):
         return None
     
     def solveAstar(self,state):
+        start = time.time()
         visited = set()
         visited.add(state)
         q = PriorityQueue()
@@ -95,6 +98,7 @@ class RushHour(object):
             curr = q.dequeue()
             if curr.success():
                 print("Nombre d'états visités : " + str(len(visited)))
+                print("Temps écoulé : " + '%.3f' % (time.time() - start) + 's')
                 return curr
             nexts = self.moves(curr)
             for s in nexts:
@@ -125,3 +129,18 @@ class RushHour(object):
         print(str(len(res)) + " mouvements")
         for string in res[::-1]:
             print(string)
+
+    def printAnimatedAsciiSolution(self, state):
+        import sys 
+        res = []
+        if state is None:
+            return
+        while state.prev is not None:
+            res.append(state)
+            state = state.prev
+        for s in res[:0:-1]:
+            print(s)
+            for i in range(7):
+                sys.stdout.write("\033[F") # Cursor up one line
+            time.sleep(0.33)
+        print(res[0])
