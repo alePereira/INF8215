@@ -1,7 +1,7 @@
 from state import State
 from rushHour import RushHour
 
-def allTest():
+def allTest(solveType=0):
     print("*******Test 1 : ******")
     test1()
     print("\n*******Test 2 : ******")
@@ -11,13 +11,24 @@ def allTest():
     print("\n*******Test 4 : ******")
     test4()
     print("\n*******Solve 22 : ******")
-    solve22()
+    solve22(solveType)
     print("\n*******Solve 1 : ******")
-    solve1()
+    solve1(solveType)
     print("\n*******Solve 40 : ******")
-    solve40()
+    solve40(solveType)
     print("\n*******Solve A* : ******")
     solveAstar()
+
+def allTestAnalyze():
+    print("\n*******Solve 22 : ******")
+    for i in range(4):
+        solve22(i, True)
+    print("\n*******Solve 1 : ******")
+    for i in range(4):
+        solve1(i, True)
+    print("\n*******Solve 40 : ******")
+    for i in range(4):
+        solve40(i, True)
 
 def test1():
     positionning = [1, 0, 1, 4, 2, 4, 0, 1]
@@ -114,8 +125,8 @@ def test4():
         s = s.prev
     print(n)
 
-def solve22():
-    rh = RushHour()
+def solve22(solveType=0, onlyMovements=False):
+    rh = RushHour(solveType=solveType)
     rh.nbcars = 12
     rh.color = ["rouge", "vert clair", "jaune", "orange", "violet clair", "bleu ciel", "rose",
             "violet", "vert", "noir", "beige", "bleu" ]
@@ -123,23 +134,23 @@ def solve22():
     rh.len = [ 2, 2, 3, 2, 3, 2, 2, 2, 2, 2, 2, 3 ]
     rh.moveOn = [ 2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5 ]
     s = State(p=[1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 1 ], rhInstance=rh)
-    s = rh.solve(s)
-    rh.printSolution(s)
+
+    solving(s, solveType, onlyMovements)
 
 
-def solve1():
-    rh = RushHour()
+def solve1(solveType=0, onlyMovements=False):
+    rh = RushHour(solveType=solveType)
     rh.nbcars = 8
     rh.color = ["rouge", "vert clair", "violet", "orange", "vert", "bleu ciel", "jaune", "bleu" ]
     rh.horiz = [ True, True, False, False, True, True, False, False ]
     rh.len =[ 2, 2, 3, 2, 3, 2, 3, 3 ]
     rh.moveOn = [ 2, 0, 0, 0, 5, 4, 5, 3 ]
     s = State(p=[ 1, 0, 1, 4, 2, 4, 0, 1 ], rhInstance=rh)
-    s = rh.solve(s)
-    rh.printAnimatedAsciiSolution(s)
 
-def solve40():
-    rh = RushHour()
+    solving(s, solveType, onlyMovements)
+
+def solve40(solveType=0, onlyMovements=False):
+    rh = RushHour(solveType=solveType)
     rh.nbcars = 13
     rh.color = [ "rouge", "jaune", "vert clair", "orange", "bleu clair", "rose", "violet clair",
             "bleu", "violet", "vert", "noir", "beige", "jaune clair" ]
@@ -148,8 +159,25 @@ def solve40():
     rh.len =  [ 2, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2 ]
     rh.moveOn =  [ 2, 0, 0, 4, 1, 2, 5, 3, 3, 2, 4, 5, 5 ]
     s = State(p=[ 3, 0, 1, 0, 1, 1, 1, 0, 3, 4, 4, 0, 3 ], rhInstance=rh)
-    s = rh.solve(s)
-    rh.printSolution(s)
+
+    solving(s, solveType, onlyMovements)
+
+   
+
+def solving(s, solveType=0, onlyMovements=False):
+    if solveType == 0:
+        print("Recherche en largeur")
+        s = s.rh.solve(s)
+    else:
+        if(solveType == 1):
+            print("\nRecherche en profondeur")
+        elif(solveType == 2):
+            print("\nRecherche heuristique 1")
+        else:
+            print("\nRecherche heuristique 2")
+        s = s.rh.solveAstar(s)
+
+    s.rh.printSolution(s,onlyMovements)
 
 def solveAstar():
     rh = RushHour()
@@ -193,6 +221,8 @@ if __name__ == '__main__':
         elif sys.argv[1] == '7':
             print("*******Solve 40 : ******")
             solve40()
-        else:
+        elif sys.argv[1] == '8':
             solveAstar()
             print("*******Solve A* : ******")
+        else:
+            allTestAnalyze()

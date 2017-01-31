@@ -20,7 +20,13 @@ class State(object):
         self.c = c
         self.d = d
         self.pos[c] += d
-        self.f = self.estimee2()
+
+        if(self.rh is None or self.rh.solveType <= 1):
+            self.f = 1
+        elif(self.rh.solveType == 2):
+            self.f = self.estimee1()
+        else:
+            self.f = self.estimee2()
 
     def success(self):
         return self.pos[0] == 4

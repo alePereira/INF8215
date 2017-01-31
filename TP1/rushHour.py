@@ -5,7 +5,7 @@ import time
 
 class RushHour(object):
     
-    def __init__(self):
+    def __init__(self, solveType=0):
         """
             definition de la grille
         """
@@ -15,6 +15,7 @@ class RushHour(object):
         self.len = []
         self.moveOn = []
         self.free = [[True] * 6 for _ in range(6)]
+        self.solveType = solveType
 
     def numberOfCarsBlocking(self, state):
         free = [[True] * 6 for _ in range(6)]
@@ -108,7 +109,7 @@ class RushHour(object):
         print("Pas de solution")
         return None
 
-    def printSolution(self,state):
+    def printSolution(self,state,onlyMovements=False):
         res = []
         if state is None:
             return
@@ -127,8 +128,10 @@ class RushHour(object):
             res.append(aux)
             state = state.prev
         print(str(len(res)) + " mouvements")
-        for string in res[::-1]:
-            print(string)
+        if(not onlyMovements):
+            for string in res[::-1]:
+                print(string)
+
 
     def printAnimatedAsciiSolution(self, state):
         import sys 
