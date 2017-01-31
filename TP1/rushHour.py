@@ -29,7 +29,7 @@ class RushHour(object):
                 x = state.pos[i]
                 for j in range(self.len[i]):
                     free[x+j][y] = False
-        return len([x for x in free[1][state.pos[0]+self.len[0]-1:] if not x])
+        return len([x for x in free[1][state.pos[0]+self.len[0]:] if not x])
 
     def initFree(self, state):
         self.free = [[True] * 6 for _ in range(6)]
