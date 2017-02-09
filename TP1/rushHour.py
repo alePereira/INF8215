@@ -18,19 +18,26 @@ class RushHour(object):
         self.solveType = solveType
 
     def numberOfCarsBlocking(self, state):
-        free = [[True] * 6 for _ in range(6)]
-        for i in range(self.nbcars):
-            if self.horiz[i]:
-                x = self.moveOn[i]
-                y = state.pos[i]
-                for j in range(self.len[i]):
-                    free[x][y+j] = False
-            else:
-                y = self.moveOn[i]
-                x = state.pos[i]
-                for j in range(self.len[i]):
-                    free[x+j][y] = False
+        free = [[x for x in y] for y in self.free]
+        car = state.c
+        if self.horiz[car]:
+            x1 = self.moveOn[car]
+            y1 = state.pos[car]-1
+            x2 = self.moveOn[car]
+            y2 = state.pos[car] + self.len[car] - 1
+        else:
+            y1 = self.moveOn[car]
+            x1 = state.pos[car]-1 
+            y2 = self.moveOn[car]
+            x2 = state.pos[car] + self.len[car] - 1 
+        if state.d == 1:
+            free[x1][y1] = True
+            free[x2][y2] = False
+        else:
+            free[x1][y1] = False
+            free[x2][y2] = True
         return len([x for x in free[1][state.pos[0]+self.len[0]:] if not x])
+
 
     def initFree(self, state):
         self.free = [[True] * 6 for _ in range(6)]
