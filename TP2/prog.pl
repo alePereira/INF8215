@@ -98,20 +98,29 @@ valid_collumns(Constraints, Grid):-
 var_list(N,L) :- 
     length(L,N).
 
-var_matrix(N,M):-
-    var_matrix_bis(N,N,M).
+% Matrice carrée Size*Size
+var_matrix(Size, M):-
+    var_matrix_bis(Size, Size, M).
 
-var_matrix_bis(N, 0, Last):-
+% Matrice rectangulaire Lines*Collumns
+var_matrix(Lines, Collumns, M):-
+    var_matrix_bis(Lines, Collumns, M).
+
+var_matrix_bis(0, Collumns, Last):-
     Last = [].
 
-var_matrix_bis(N, Count, [First|Tail]):-
-    var_list(N, First),
+var_matrix_bis(Count, Collumns, [First|Tail]):-
+    var_list(Collumns, First),
     CountBis is Count - 1,
-    var_matrix_bis(N, CountBis, Tail).
+    var_matrix_bis(CountBis, Collumns, Tail).
 
-% Clause qui résout un problème sur une série de contraintes.
+% Clause qui résout un problème sur une série de contraintes (matrice carrée).
 resolve(Size, LinesConstraints, CollumnsConstraints):-
-    var_matrix(Size, M),
+    resolve(Size, Size, LinesConstraints, CollumnsConstraints).
+
+% Clause qui résout un problème sur une série de contraintes (matrice rectangulaire).
+resolve(SizeLines, SizeCollumns, LinesConstraints, CollumnsConstraints):-
+    var_matrix(SizeLines, SizeCollumns, M),
     valid_lines(LinesConstraints, M),
     valid_collumns(CollumnsConstraints, M),
     print_nonogram(M).
