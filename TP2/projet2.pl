@@ -15,13 +15,6 @@ valid_seq([],[]).
 % Si il reste des contraintes et que la séquence est vide, la clause est fausse
 valid_seq(_, []) :- !, fail.
 
-% Clause case vide
-% Si le premier élément de la liste est blanc, on continue avec NextSeq et les mêmes contraintes
-% (Consiste à sauter les cases blanches)
-valid_seq(CONSTRAINTS, [FirstElem|NextSeq]):-
-    isWhite(FirstElem), 
-    valid_seq(CONSTRAINTS, NextSeq).
-
 % Clause case pleine
 % Si le premier élément de la liste est noir, on compte s'il est suivi de FirstConstraint-1 case noires.
 % Fais appel à la clause count.
@@ -31,6 +24,13 @@ valid_seq([FirstConstraint|NextConstraint], [FirstElem|NextSeq]):-
     isBlack(FirstElem),
     count(FirstConstraint, [FirstElem|NextSeq], Remaining),
     valid_seq(NextConstraint, Remaining).
+
+% Clause case vide
+% Si le premier élément de la liste est blanc, on continue avec NextSeq et les mêmes contraintes
+% (Consiste à sauter les cases blanches)
+valid_seq(CONSTRAINTS, [FirstElem|NextSeq]):-
+    isWhite(FirstElem), 
+    valid_seq(CONSTRAINTS, NextSeq).
 
 % Clauses isWhite/isBlack. Straightforward.
 isWhite(0).
@@ -106,7 +106,7 @@ var_matrix(Size, M):-
 var_matrix(Lines, Collumns, M):-
     var_matrix_bis(Lines, Collumns, M).
 
-var_matrix_bis(0, Collumns, Last):-
+var_matrix_bis(0, _, Last):-
     Last = [].
 
 var_matrix_bis(Count, Collumns, [First|Tail]):-
@@ -121,9 +121,11 @@ resolve(Size, LinesConstraints, CollumnsConstraints):-
 % Clause qui résout un problème sur une série de contraintes (matrice rectangulaire).
 resolve(SizeLines, SizeCollumns, LinesConstraints, CollumnsConstraints):-
     var_matrix(SizeLines, SizeCollumns, M),
+    preprocess(LinesConstraints, CollumnsConstraints, M),
     valid_lines(LinesConstraints, M),
     valid_collumns(CollumnsConstraints, M),
-    print_nonogram(M).
+    write('Résultat :'),nl,
+    print_nonogram(M),nl.
 
 % Fonctions transposée. Pour une raison inconnue, la fonction
 % standard ne fonctionnait pas (renvoyait toujours false)
@@ -140,11 +142,115 @@ lists_firsts_rests([], [], []).
 lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]) :-
         lists_firsts_rests(Rest, Fs, Oss).
 
+
+%%%%%%%%%%%%%%%%% Picross preprocessing section %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Calcule le nombre de contraintes avec espace
+% Il s'agit de la somme de chaque contrainte + un 1 entre chaque contrainte (à cause de la case blanche après chaque bloc noir)
+% Exemple : [3] donne 3
+%           [1,1] donne 3
+sumConstraintsWithSpace([Elem|[]], Sum):-
+    !, Sum is Elem.
+
+sumConstraintsWithSpace([Elem|Tail], Sum):-
+    sumConstraintsWithSpace(Tail, Aux),
+    Sum is Elem + Aux + 1.
+
+% Calcule le nombre de contraintes sans espace
+% Il s'agit de la somme de chaque contrainte.
+% Exemple : [3] donne 3
+%           [1,1] donne 2
+sumConstraintsWithoutSpace([Elem|[]], Sum):-
+    !, Sum is Elem.
+
+sumConstraintsWithoutSpace([Elem|Tail], Sum):-
+    sumConstraintsWithoutSpace(Tail, Aux),
+    Sum is Elem + Aux.
+
+% Calcule le nombre de cases noires dans une séquence
+sumBlackCells([], Sum):-
+    !, Sum is 0.
+
+sumBlackCells([Head|Tail], Sum):-
+    var(Head), !,
+    sumBlackCells(Tail, Sum).
+
+sumBlackCells([Head|Tail], Sum):-
+    isWhite(Head), !,
+    sumBlackCells(Tail, Sum).
+
+sumBlackCells([Head|Tail], Sum):-
+    isBlack(Head), !,
+    sumBlackCells(Tail, Aux),
+    Sum is Aux + 1.
+
+% Rempli une séquence de blanc là où les variables sont non unifiées
+fillSeqWithWhite([]).
+
+fillSeqWithWhite([Head|Tail]):-
+    var(Head),!,
+    isWhite(Head),!,
+    fillSeqWithWhite(Tail).
+
+fillSeqWithWhite([Head|Tail]):-
+    fillSeqWithWhite(Tail).
+
+
+% Fonctions de préprocessing, qui permettent de remplir la grille avec les lignes/Colonnes dont on est sûr
+% C'est à dire que le nombre de contraintes est identique à la taille de la ligne.
+% Pour les colonnes même combat, on utilise la transposée.
+preprocessLines([], []).
+
+preprocessLines([Constraint|NextConstraints], [Line|NextLines]):-
+    sumConstraintsWithSpace(Constraint, SumConstraints),
+    length(Line, SizeLine),
+    SumConstraints =:= SizeLine,
+    valid_seq(Constraint, Line),
+    preprocessLines(NextConstraints, NextLines).
+
+preprocessLines([Constraint|NextConstraints], [Line|NextLines]):-
+    preprocessLines(NextConstraints, NextLines).
+
+preprocessCollumns(Constraints, Grid):-
+    transposed(Grid, TransposedGrid),
+    preprocessLines(Constraints, TransposedGrid),
+    transposed(TransposedGrid, Grid).
+
+% Après une première passe, on peut assigner en blanc toutes les cases non unifiées si sur la ligne toutes
+% les contraintes sont respectées
+preprocessLinesSecondPass([],[]).
+
+preprocessLinesSecondPass([Constraint|NextConstraints], [Line|NextLines]):-
+    sumConstraintsWithoutSpace(Constraint, SumConstraints),
+    sumBlackCells(Line, SizeLine),
+    SumConstraints =:= SizeLine,
+    fillSeqWithWhite(Line),
+    preprocessLinesSecondPass(NextConstraints, NextLines).
+
+preprocessLinesSecondPass([Constraint|NextConstraints], [Line|NextLines]):-
+    preprocessLinesSecondPass(NextConstraints, NextLines).
+
+preprocessCollumnsSecondPass(Constraints, Grid):-
+    transposed(Grid, TransposedGrid),
+    preprocessLinesSecondPass(Constraints, TransposedGrid),
+    transposed(TransposedGrid, Grid).
+
+% Preprocess général
+preprocess(LinesConstraints, CollumnsConstraints, Grid):-
+    preprocessLines(LinesConstraints,Grid),
+    preprocessCollumns(CollumnsConstraints,Grid),
+    write('Première passe Preprocessing (? = inconnu)'),nl,
+    print_nonogram(Grid),nl,
+    preprocessLinesSecondPass(LinesConstraints,Grid),
+    preprocessCollumnsSecondPass(CollumnsConstraints,Grid),
+    write('Seconde passe Preprocessing (? = inconnu)'),nl,
+    print_nonogram(Grid),nl.
+    
+
 %%%%%%%%%%%%%%% Print Section %%%%%%%%%%%%%
 
 print_nonogram(N) :-
-    nl,write('Found nonogram:'),nl,
-    print_nonogram1(N).
+    nl,print_nonogram1(N).
 
 print_nonogram1([]).
 
@@ -153,6 +259,12 @@ print_nonogram1([Line | Lines]) :-
     print_nonogram1(Lines).
 
 print_line([]).
+
+print_line([Head | Tail]) :-
+    var(Head),
+    write('?'),
+    print_line(Tail).
+
 print_line([Head | Tail]) :-
     Head = 1,
     write('#'),
@@ -252,4 +364,11 @@ allTests():-
     test2(),
     test3(),
     test4().
+
+allTestsWithInfo():-
+    nl,write('Exécution de tous les tests avec info... AVEC 2 PASSES DE PREPROCESSING'),nl,
+    time(test1()),
+    time(test2()),
+    time(test3()),
+    time(test4()).
 
