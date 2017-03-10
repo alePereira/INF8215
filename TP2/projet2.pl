@@ -155,12 +155,12 @@ print_nonogram1([Line | Lines]) :-
 print_line([]).
 print_line([Head | Tail]) :-
     Head = 1,
-    write('# '),
+    write('#'),
     print_line(Tail).
 
 print_line([Head | Tail]) :-
     Head = 0,
-    write('. '),
+    write('.'),
     print_line(Tail).
 
 %%%%%%%%%%%%%% Test Section %%%%%%%%%%%%%%
@@ -169,6 +169,7 @@ print_line([Head | Tail]) :-
 
 % Test1:
 test1():-
+    nl,write('%%%%%%%%%% Test1 %%%%%%%%%%'),nl,
     Test1_Size is 5,
     Test1_Lines = [[5],[1],[5],[1],[5]],
     Test1_Collumns = [[3,1], [1,1,1], [1,1,1], [1,1,1], [1,3]],
@@ -184,6 +185,7 @@ test1():-
 
 % Test2:
 test2():-
+    nl,write('%%%%%%%%%% Test2 %%%%%%%%%%'),nl,
     Test2_Size is 5,
     Test2_Lines = [[1,1,1], [5], [3], [1,1], [3]],
     Test2_Collumns = [[2], [4], [3,1], [4], [2]],
@@ -199,6 +201,7 @@ test2():-
 
 % Test3:
 test3():-
+    nl,write('%%%%%%%%%% Test3 %%%%%%%%%%'),nl,
     Test3_Size is 10,
     Test3_Lines = [[2,2], [2,4,2], [1,3,2,1], [4,3], [4,3], [3,4], [2,5], [6], [4], [2,2]],
     Test3_Collumns = [[2], [2,4], [1,6,1], [5,3], [4,3], [1,4], [9], [1,6,1], [2,4], [2]],
@@ -219,6 +222,7 @@ test3():-
 
 % Test4:
 test4():-
+    nl,write('%%%%%%%%%% Test4 %%%%%%%%%%'),nl,
     Test4_Size is 15,
     Test4_Lines = [[10,2], [9,1], [9,4], [9,5], [2,5,4], [1,1,2,4], [2,2,2,3], [2,1,2,2,2], [3,2,1,2,1], [3,2,1,1,1], [3,2,1,1,1], [2,2,1,1,1], [1,1,1], [2,2], [15]],
     Test4_Collumns = [[4,6,3], [5,6,2], [5,4,1], [4,1,1,1], [4,1,1,1,1], [5,1,1,1,1], [5,1,1,1,1], [5,1,1,1,1], [6,1,1,1], [1,4,1,1,1], [1,3,1], [4,1,1], [5,4,1], [1,6,2], [15]],
@@ -240,4 +244,12 @@ test4():-
 %     #...........#.#
 %     ##...........##
 %     ###############
+
+% Exécution de tous les tests
+allTests():-
+    nl,write('Exécution de tous les tests...'),nl,
+    test1(),
+    test2(),
+    test3(),
+    test4().
 
