@@ -235,15 +235,108 @@ preprocessCollumnsSecondPass(Constraints, Grid):-
     preprocessLinesSecondPass(Constraints, TransposedGrid),
     transposed(TransposedGrid, Grid).
 
+% La troisième passe consiste à compléter les blocs noirs si ils sont définis aux extrémités de la grille
+% On rajoute aussi une case blanche après un bloc noir.
+
+preprocessLinesThirdPass([], []).
+
+preprocessLinesThirdPass([Constraint|NextConstraints], [Line|NextLines]):-
+    checkFirstCell(Constraint, Line),
+    checkLastCell(Constraint, Line, _),
+    preprocessLinesThirdPass(NextConstraints, NextLines).
+
+preprocessCollumnsThirdPass(Constraints, Grid):-
+    transposed(Grid, TransposedGrid),
+    preprocessLinesThirdPass(Constraints, TransposedGrid),
+    transposed(TransposedGrid, Grid).
+
+% Ces clauses vérifient si la première case est noire. Si oui, on rempli toute la
+% suite avec le nombre de cases noires correspondant à la première contrainte.
+checkFirstCell([FirstConstraint|_], [FirstElem|Next]):-
+    nonvar(FirstElem),
+    isBlack(FirstElem),
+    Count is FirstConstraint - 1,
+    fillWithBlack(Next, Count).
+
+% Si jamais nonvar(FirstElem) ou isBlack(FirstElem) échoue (aka. la première case
+% est indéterminée ou blanche), on sort avec la clause toujours vraie.
+checkFirstCell(_, _).
+
+% Clauses pour remplir de noir.
+% Celle ci vérifie si on a atteint le nombre de cases noires à remplir.
+% On rajoute alors une case blanche.
+fillWithBlack([Elem|_], Count):-
+    Count =:= 0,
+    isWhite(Elem).
+
+% Dans le cas où il reste à remplir, on remplit.
+fillWithBlack([Elem|Next], Count):-
+    Count > 0,
+    isBlack(Elem),
+    Aux is Count - 1,
+    fillWithBlack(Next, Aux).
+
+% Clauses vérifiant si la dernière case est noire. Si oui on rempli
+% toutes les cases précédent correspondant à la dernière contrainte.
+
+checkLastCell([LastConstraint|[]], [LastElem|[]], Count):-
+    nonvar(LastElem),
+    isBlack(LastElem),
+    Count is LastConstraint.
+
+checkLastCell([_|[]], [_|[]], Count):-
+    Count is 0.
+
+% S'il reste des contraintes, on relance la clause pour n'avoir que la dernière contrainte
+checkLastCell([_|NextConstraints], [LastElem|[]], Count):-
+    checkLastCell(NextConstraints, [LastElem|[]], Aux),
+    Count is Aux.
+
+checkLastCell(Constraints, [Elem|Next], Count):-
+    checkLastCell(Constraints, Next, Aux),
+    cutCheckLastCell(Elem, Aux),
+    Count is Aux - 1.
+
+% Clauses pour arrêter la remontée des clauses.
+cutCheckLastCell(_, Count):-
+    var(Count).
+
+cutCheckLastCell(_, Count):-
+    nonvar(Count),
+    Count < 1.
+
+cutCheckLastCell(Elem, Count):-
+    nonvar(Count),
+    Count =:= 1,
+    isWhite(Elem).
+
+cutCheckLastCell(Elem, Count):-
+    nonvar(Count),
+    Count > 1,    
+    isBlack(Elem).
+
 % Preprocess général
+% Les différentes passes peuvent être exécutées plusieurs fois et 
+% dans un ordre différetnt.
+% Exemple ici, on effectue la passe 3 deux fois de suite car il est
+% possible que la première fois, cette passe rajoute des cases noires aux extrémités
+% On peut donc relancer la passe.
+% De même on relance la passe 2 si jamais on a rempli des lignes/colonnes avec toutes les contraintes.
 preprocess(LinesConstraints, CollumnsConstraints, Grid):-
     preprocessLines(LinesConstraints,Grid),
     preprocessCollumns(CollumnsConstraints,Grid),
-    write('Première passe Preprocessing (? = inconnu)'),nl,
-    print_nonogram(Grid),nl,
     preprocessLinesSecondPass(LinesConstraints,Grid),
     preprocessCollumnsSecondPass(CollumnsConstraints,Grid),
-    write('Seconde passe Preprocessing (? = inconnu)'),nl,
+    %trace,
+    preprocessLinesThirdPass(LinesConstraints,Grid),
+    %trace,
+    preprocessCollumnsThirdPass(CollumnsConstraints,Grid),
+    %trace,
+    preprocessLinesThirdPass(LinesConstraints,Grid),
+    preprocessCollumnsThirdPass(CollumnsConstraints,Grid),
+    preprocessLinesSecondPass(LinesConstraints,Grid),
+    preprocessCollumnsSecondPass(CollumnsConstraints,Grid),
+    write('Passes : 1-2-3-3-2 (? = inconnu)'),nl,
     print_nonogram(Grid),nl.
     
 
