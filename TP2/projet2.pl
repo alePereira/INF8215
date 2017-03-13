@@ -327,16 +327,13 @@ preprocess(LinesConstraints, CollumnsConstraints, Grid):-
     preprocessCollumns(CollumnsConstraints,Grid),
     preprocessLinesSecondPass(LinesConstraints,Grid),
     preprocessCollumnsSecondPass(CollumnsConstraints,Grid),
-    %trace,
     preprocessLinesThirdPass(LinesConstraints,Grid),
-    %trace,
     preprocessCollumnsThirdPass(CollumnsConstraints,Grid),
-    %trace,
     preprocessLinesThirdPass(LinesConstraints,Grid),
     preprocessCollumnsThirdPass(CollumnsConstraints,Grid),
     preprocessLinesSecondPass(LinesConstraints,Grid),
     preprocessCollumnsSecondPass(CollumnsConstraints,Grid),
-    write('Passes : 1-2-3-3-2 (? = inconnu)'),nl,
+    write('Passes : 1->2->3->3->2 (? = inconnu)'),nl,
     print_nonogram(Grid),nl.
     
 
@@ -435,20 +432,21 @@ test4():-
     resolve(Test4_Size, Test4_Lines, Test4_Collumns).
 
 % Res :
-%     ##########...##
-%     #########.....#
-%     #########..####
-%     .##..#####.####
-%     #..#....##.####
-%     ##..##...##.###
-%     ##.#..##.##..##
-%     ###.##..#.##..#
-%     ###...##.#..#.#
-%     ###.##..#...#.#
-%     .##...#..#..#.#
-%     #...........#.#
-%     ##...........##
-%     ###############
+%   ##########...##
+%   #########.....#
+%   #########..####
+%   #########.#####
+%   .##..#####.####
+%   #..#....##.####
+%   ##..##...##.###
+%   ##.#..##.##..##
+%   ###.##..#.##..#
+%   ###...##.#..#.#
+%   ###.##..#...#.#
+%   .##...##.#..#.#
+%   #...........#.#
+%   ##...........##
+%   ###############
 
 % Exécution de tous les tests
 allTests():-
@@ -459,7 +457,7 @@ allTests():-
     test4().
 
 allTestsWithInfo():-
-    nl,write('Exécution de tous les tests avec info... AVEC 2 PASSES DE PREPROCESSING'),nl,
+    nl,write('Exécution de tous les tests avec info... AVEC 5 PASSES DE PREPROCESSING'),nl,
     time(test1()),
     time(test2()),
     time(test3()),
