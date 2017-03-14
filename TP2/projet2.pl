@@ -125,7 +125,7 @@ resolve(SizeLines, SizeCollumns, LinesConstraints, CollumnsConstraints):-
     valid_lines(LinesConstraints, M),
     valid_collumns(CollumnsConstraints, M),
     write('Résultat :'),nl,
-    print_nonogram(M),nl.
+    print_nonogram_with_constraints(M, LinesConstraints, CollumnsConstraints),nl.
 
 % Fonctions transposée. Pour une raison inconnue, la fonction
 % standard ne fonctionnait pas (renvoyait toujours false)
@@ -334,13 +334,22 @@ preprocess(LinesConstraints, CollumnsConstraints, Grid):-
     preprocessLinesSecondPass(LinesConstraints,Grid),
     preprocessCollumnsSecondPass(CollumnsConstraints,Grid),
     write('Passes : 1->2->3->3->2 (? = inconnu)'),nl,
-    print_nonogram(Grid),nl.
+    print_nonogram_with_constraints(Grid, LinesConstraints, CollumnsConstraints),nl.
     
 
 %%%%%%%%%%%%%%% Print Section %%%%%%%%%%%%%
 
 print_nonogram(N) :-
     nl,print_nonogram1(N).
+
+% Affiche le nonogram avec les contraintes sur les lignes et colonnes
+% Comportement non garanti si la grille fait plus de 15x15.
+% Les contraintes entre 10 et 15 sont affichées en hexadecimal.
+print_nonogram_with_constraints(N, LinesConstraints, CollumnsConstraints):-
+    computeMaxConstraints(LinesConstraints, MaxLines),
+    computeMaxConstraints(CollumnsConstraints, MaxCollumns),
+    printCollumnsConstraints(CollumnsConstraints, MaxLines, MaxCollumns),
+    printLines(N, LinesConstraints, MaxLines).
 
 print_nonogram1([]).
 
@@ -352,18 +361,93 @@ print_line([]).
 
 print_line([Head | Tail]) :-
     var(Head),
-    write('?'),
+    write('? '),
     print_line(Tail).
 
 print_line([Head | Tail]) :-
     Head = 1,
-    write('#'),
+    write('# '),
     print_line(Tail).
 
 print_line([Head | Tail]) :-
     Head = 0,
-    write('.'),
+    write('. '),
     print_line(Tail).
+
+% Affichage des contraintes
+printLines([], [], _).
+ 
+printLines([Line|Next], [LineConstraints|NextConstraints], MaxLines):-
+    printLine(Line, LineConstraints, MaxLines),nl,
+    printLines(Next, NextConstraints, MaxLines).
+
+printLine(Line, [], MaxLines):-
+    write(' '), print_line(Line).
+
+printLine(Line, LineConstraints, MaxLines):-
+    length(LineConstraints, L),
+    L < MaxLines,
+    write('  '),
+    MaxLinesAux is MaxLines - 1,
+    printLine(Line, LineConstraints, MaxLinesAux).
+
+printLine(Line, [FirstConstraint|NextConstraints], MaxLines):-
+    format('~16r', FirstConstraint), write(' '), 
+    MaxLinesAux is MaxLines - 1, 
+    printLine(Line, NextConstraints, MaxLinesAux).
+
+printCollumnsConstraints(_,_,0).
+
+printCollumnsConstraints(CollumnsConstraints, MaxLines, MaxCollumns):-
+    printSpaces(MaxLines), write(' '),
+    printCollumns(CollumnsConstraints, MaxCollumns),
+    nl,
+    MaxCollumnsAux is MaxCollumns - 1,
+    printCollumnsConstraints(CollumnsConstraints, MaxLines, MaxCollumnsAux).
+
+printCollumns([], _).
+
+printCollumns([FirstConstraint|NextConstraints], MaxCollumns):-
+    length(FirstConstraint, L),
+    L >= MaxCollumns,
+    Indice is L - MaxCollumns,
+    nth0(Indice, FirstConstraint, Elem),
+    format('~16r', Elem), write(' '), 
+    printCollumns(NextConstraints, MaxCollumns).
+
+printCollumns([FirstConstraint|NextConstraints], MaxCollumns):-
+    write('  '),
+    printCollumns(NextConstraints, MaxCollumns).
+
+printSpaces(0).
+
+printSpaces(Count):-
+    write('  '),
+    Aux is Count - 1,
+    printSpaces(Aux).
+
+computeNbConstraints([], Num):-
+    Num is 0.
+
+computeNbConstraints([FirstConstraint|NextConstraints], Num):-
+    computeNbConstraints(NextConstraints, Aux),
+    Num is Aux + 1.
+
+computeMaxConstraints([], Max):-
+    Max is 0.
+
+computeMaxConstraints([FirstConstraint|NextConstraints], Max):-
+    computeMaxConstraints(NextConstraints, Aux),
+    computeNbConstraints(FirstConstraint, Aux2),
+    maxBetween(Aux, Aux2, Max).
+
+maxBetween(A,B,Res):-
+    A > B,
+    Res is A.
+
+maxBetween(A,B,Res):-
+    Res is B.
+
 
 %%%%%%%%%%%%%% Test Section %%%%%%%%%%%%%%
 
