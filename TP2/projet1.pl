@@ -127,8 +127,8 @@ format('~w sert pour le petit dejeuner ?',[X]),
 read(Reponse),
 Reponse = 'oui'.
 
-ask(onde,X) :-
-format('~w utilise des micro-ondes ?',[X]),
+ask(four,X) :-
+format('~w est un four ?',[X]),
 read(Reponse),
 Reponse = 'oui'.
 
@@ -168,11 +168,14 @@ format('~w sert a laver le sol ?',[X]),
 read(Reponse),
 Reponse = 'oui'.
 
+ask(toaster,X) :-
+format('~w est un grille pain ?',[X]),
+read(Reponse),
+Reponse = 'oui'.
+
 
 % parcours de l'arbre : baser sur des choix "dichtomique" on essaie a
 % chaque question de diminuer l'espace de recherche par 2.
-% La premiere question est le genre car separe le mieux les items
-% (16 hommes et 6 femmes)
 personne(X) :- genre(X).
 
 genre(X):-
@@ -314,7 +317,8 @@ objet(X) :- cuisine(X).
 
 cuisine(X) :-
 ask(cuisine,X),!,
-dansLaCuisine(X).
+dansLaCuisine(X),
+cuisine_fact(X).
 
 cuisine(X) :-
 ask(bureau,X),!,
@@ -322,56 +326,13 @@ bureau(X).
 
 cuisine(X) :-
 ask(surSoi,X),!,
-surSoi(X).
-
-surSoi(X) :-
-ask(porter,X),!,
-porter(X).
-
-surSoi(X):-
-ask(ouvrir,X),!,
-ouvrir(X).
-
-surSoi(X) :- argent(X).
-
+objet_surSoi(X).
 
 cuisine(X) :-
-ask(nettoyer, X),!,
-nettoyer(X).
-
-nettoyer(X) :-
-ask(sol,X),!,
-sol(X).
-
-
-sol(X) :-
-ask(electromenager,X),!,
-nettoyant(X),
-electromenager_fact(X).
-
-sol(X) :- nettoyant(X), \+ cuisine_fact(X), \+ electromenager_fact(X).
-
-nettoyer(X) :- savon(X).
-
-
-bureau(X) :-
-ask(electronique,X),!,
-electronique(X).
-
-electronique(X) :-
-ask(appeler,X),!,
-appeler(X).
-
-electronique(X) :-
-ordinateur(X).
-
-bureau(X) :-
-ask(ecrire,X),!,
-ecrire(X).
-
-bureau(X) :- eclaire(X).
-
-
+ask(nettoyer,X),!,
+nettoyer(X),
+\+ cuisine_fact(X)
+.
 
 cuisine(X) :-
 ask(plante,X),!,
@@ -379,58 +340,112 @@ plante(X).
 
 cuisine(X) :-
 ask(instrument,X),!,
-instrument(X).
+instrument(X)
+.
 
-cuisine(X) :- dormir(X).
+cuisine(X) :-
+chambre(X),meuble(X).
 
+
+%sous arbre des elements de la cuisine
 dansLaCuisine(X) :-
 ask(electromenager,X),!,
-electromenager(X).
-
-electromenager(X) :-
-ask(dejeuner,X),!,
-dejeuner(X).
-
-electromenager(X) :-
-ask(onde,X),!,
-microOnde(X).
-
-electromenager(X) :- cuisiniere(X).
-
-dejeuner(X) :-
-ask(pain,X),!,
-pain(X).
-
-dejeuner(X) :- cafetiere(X).
+electromenager(X)
+.
 
 dansLaCuisine(X) :-
 ask(ustensil,X),!,
 ustensil(X).
 
+dansLaCuisine(X) :-
+ask(nettoyer,X),!,
+nettoyant(X).
 
+dansLaCuisine(X) :- meuble(X).
+
+%sous arbre de l'electromenager
+electromenager(aspirateur) :- electromenager_fact(aspirateur).
+
+electromenager(X) :-
+ask(dejeuner,X),!,
+dejeuner(X)
+.
+
+electromenager(X) :-
+ask(four,X),!,
+four(X).
+
+electromenager(X) :- plaque_cuisson(X).
+
+
+%sous arbre du petit dejeuner
+dejeuner(X) :-
+ask(toaster,X),!,
+toaster(X).
+
+dejeuner(X) :- machine_a_cafe(X).
+
+
+%sous arbre des ustensils
 ustensil(X) :-
 ask(manger,X),!,
 manger(X).
+
+ustensil(X) :- batterie_de_cuisine(X).
 
 manger(X) :-
 ask(dedans,X),!,
 plat(X).
 
-manger(X) :-
-couvert(X).
+manger(X) :- couvert(X).
 
-ustensil(X) :- casserole(X).
 
-dansLaCuisine(X) :-
-ask(nettoyer,X),!,
+% sous arbre des elements se trouvant au bureau
+bureau(X) :-
+ask(electronique,X),!,
+electronique(X).
+
+bureau(X) :-
+ask(ecrire,X),!,
+materiel_ecriture(X).
+
+bureau(X) :- eclairage(X).
+
+
+electronique(X) :-
+ask(appeler,X),!,
+communication(X).
+
+electronique(X) :- informatique(X).
+
+
+% sous arbre des objets portés sur soi
+objet_surSoi(X) :-
+ask(porter,X),!,
+sac(X).
+
+objet_surSoi(X) :-
+ask(ouvrir,X),
+quincaillerie(X).
+
+objet_surSoi(X) :- porte_document(X).
+
+% sous abre des objets servant a nettoyer
+nettoyer(X) :-
+ask(sol,X),!,
+sol(X).
+
+nettoyer(X) :- savon(X).
+
+sol(X) :-
+ask(electromenager,X),!,
 nettoyant(X),
-cuisine_fact(X).
+electromenager_fact(X).
 
-dansLaCuisine(X) :- desk(X).
-
+sol(X) :- nettoyant(X), \+ electromenager_fact(X).
 
 %%%%%%%%%%%%%%%%%%%%base de connaissance%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%* base de connaissance pour les personnes
+% base de connaissance pour les personnes
 homme_fact(michael_jackson).
 homme_fact(john_lewis).
 homme_fact(mario).
@@ -447,6 +462,7 @@ homme_fact(rafael_nadal).
 homme_fact(jacques_villeneuve).
 homme_fact(stephen_harper).
 homme_fact(barack_obama).
+
 chanteur(michael_jackson).
 chanteur(celine_dion).
 jazz(john_lewis).
@@ -475,29 +491,50 @@ pays(canada).
 pays(usa).
 pays(egypte).
 
-%*base de connaissance pour les objets:
+% base de connaissance pour les objets:
+
+% clean
+cuisine_fact(detergent_vaisselle).
+cuisine_fact(four_micro_onde).
+cuisine_fact(cuisiniere).
+cuisine_fact(grille_pain).
+cuisine_fact(cafetiere).
+cuisine_fact(table).
+cuisine_fact(casserole).
+cuisine_fact(assiette).
+cuisine_fact(fourchette).
+cuisine_fact(table).
+
+
+electromenager_fact(aspirateur).
+electromenager_fact(four_micro_onde).
+electromenager_fact(cuisiniere).
+electromenager_fact(grille_pain).
+electromenager_fact(cafetiere).
+
+nettoyant(shampoing).
+nettoyant(detergent_vaisselles).
+nettoyant(aspirateur).
+nettoyant(balais).
+
+meuble(table).
+meuble(lit).
 
 instrument(piano).
 plante(cactus).
-dormir(lit).
-cuisine_fact(detergent).
-nettoyant(detergent).
-desk(table).
-microOnde(four_micro_onde).
-cuisiniere(cuisiniere).
-pain(grille_pain).
-cafetiere(cafetiere).
-casserole(casserole).
-plat(assiette).
-couvert(fourchette).
-eclaire(lampe).
-ecrire(papier).
-appeler(telephone).
-ordinateur(ordinateur).
-ouvrir(cle).
-argent(porte_feuille).
-porter(sac_a_dos).
+chambre(lit).
 savon(shampoing).
-electromenager_fact(aspirateur).
-nettoyant(aspirateur).
-nettoyant(balais).
+couvert(fourchette).
+plat(assiette).
+materiel_ecriture(papier).
+communication(telephone).
+informatique(ordinateur).
+eclairage(lampe).
+batterie_de_cuisine(casserole).
+sac(sac_a_dos).
+machine_a_cafe(cafetiere).
+quincaillerie(cle).
+porte_document(porte_feuille).
+four(four_micro_onde).
+plaque_cuisson(cuisiniere).
+toaster(grille_pain).
