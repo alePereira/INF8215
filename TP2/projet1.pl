@@ -177,133 +177,136 @@ personne(X) :- genre(X).
 
 genre(X):-
 ask(homme,X),!,
-homme(X)
-.
+homme(X),
+homme_fact(X).
 
 genre(X) :-
 %c est une femme
-femme(X),!.
+!,femme(X),
+\+ homme_fact(X)
+.
 
 femme(X) :-
 ask(fiction,X),!,
-fiction(X,femme)
+fiction(X)
 .
 
 femme(X) :-
 ask(artiste,X),!,
-artiste(X,femme).
+artiste(X).
 
 femme(X) :-
 ask(sportif,X),!,
-sportif(X,femme).
+sportif(X).
 
 femme(X) :-
-politicien(X,femme).
+ask(gouverne,un_pays),!,
+politicien(X).
 
 femme(X) :-
-presentatrice(X).
+presentateur(X).
 
 
 homme(X) :-
 ask(artiste,X),!,
-artiste(X,homme)
+artiste(X)
 .
 
 homme(X) :-
 ask(fiction,X),!,
-fiction(X,homme)
+fiction(X)
 .
 
 homme(X) :-
 ask(christiannisme,X),!,
-christiannisme(X,homme).
+christiannisme(X).
 
 homme(X) :-
 ask(professeur,X),!,
-professeur(X,homme).
+professeur(X).
 
 homme(X) :-
 ask(sportif,X),!,
-sportif(X,homme).
+sportif(X).
 
 
-homme(X) :- politicien(X,homme).
+homme(X) :- politicien(X).
 
 %sous arbre des sportifs
-sportif(X,Y) :-
+sportif(X) :-
 ask(tennis,X),!,
-tennis(X,homme).
+tennis(X).
 
-sportif(X,Y) :-
-pilote(X,homme).
+sportif(X) :-
+pilote(X).
 
 
 %sous arbre des professeurs
 
-professeur(X,homme):-
+professeur(X):-
 ask(ia,X),!,
 professeur_fact(X,ia).
 
-professeur(X,homme) :-
+professeur(X) :-
 professeur_fact(X,sip).
 
 
 
 %sous arbre du christiannisme
-christiannisme(X,Y) :-
+christiannisme(X) :-
 ask(pape,X),!,
 pape(X).
 
-christiannisme(X,Y) :-
+christiannisme(X) :-
 ask(ressusciter,X),!,
 jesus(X).
 
-christiannisme(X,Y) :-
+christiannisme(X) :-
 moise(X).
 
 %sous arbre des artistes
-artiste(X,Y) :-
+artiste(X) :-
 ask(musicien,X),!,
-musicien(X,Y).
+musicien(X).
 
-artiste(X,Y) :-
+artiste(X) :-
 ask(auteur,X),!,
-auteur(X,Y).
+auteur(X).
 
-artiste(X,Y) :-
-acteur(X,Y).
+artiste(X) :-
+acteur(X).
 
-musicien(X,Y) :-
+musicien(X) :-
 ask(chanteur,X),!,
-chanteur(X,Y).
+chanteur(X).
 
-musicien(X,Y) :-
+musicien(X) :-
 ask(jazzman,X),!,
 jazz(X).
 
-musicien(X,Y) :-
+musicien(X) :-
 compos(X).
 
 %sous arbre des personnages de fiction
-fiction(X,Y) :-
+fiction(X) :-
 ask(cinema,X),!,
-cinema(X,Y).
+cinema(X).
 
-fiction(X,Y) :-
-jeuxVideo(X,Y).
+fiction(X) :-
+jeuxVideo(X).
 
-cinema(X,Y) :-
+cinema(X) :-
 ask(humain,X),!,
-personnageFilm(X,Y).
+personnageFilm(X).
 
-cinema(X,Y) :-
-lasagna(X,Y).
+cinema(X) :-
+lasagna(X).
 
 %sous arbres des politiciens
-politicien(X,Z) :-
-!,gouverne(X,Y,Z),
+politicien(X) :-
+!,gouverne(X,Y),
 pays(Y),
-ask(gouverne,Y).
+ask(gouverne,Y),!.
 
 
 %%%%%%%%%%%%%%%%%%parcours de l'arbre pour les objets %%%%%%%%%%%%%%%%%%
@@ -428,30 +431,46 @@ dansLaCuisine(X) :- desk(X).
 
 %%%%%%%%%%%%%%%%%%%%base de connaissance%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %* base de connaissance pour les personnes
-chanteur(michael_jackson,homme).
-chanteur(celine_dion,femme).
+homme_fact(michael_jackson).
+homme_fact(john_lewis).
+homme_fact(mario).
+homme_fact(james_bond).
+homme_fact(garfield).
+homme_fact(victor_hugo).
+homme_fact(brad_pitt).
+homme_fact(pape_francois).
+homme_fact(jesus).
+homme_fact(moise).
+homme_fact(michel_dagenais).
+homme_fact(michel_gagnon).
+homme_fact(rafael_nadal).
+homme_fact(jacques_villeneuve).
+homme_fact(stephen_harper).
+homme_fact(barack_obama).
+chanteur(michael_jackson).
+chanteur(celine_dion).
 jazz(john_lewis).
 compos(mozart).
-jeuxVideo(mario,homme).
-jeuxVideo(lara_croft,femme).
-personnageFilm(james_bond,homme).
-personnageFilm(blanche_neige,femme).
-lasagna(garfield,homme).
-auteur(victor_hugo,homme).
-auteur(jk_rowling,femme).
-acteur(brad_pitt,homme).
+jeuxVideo(mario).
+jeuxVideo(lara_croft).
+personnageFilm(james_bond).
+personnageFilm(blanche_neige).
+lasagna(garfield).
+auteur(victor_hugo).
+auteur(jk_rowling).
+acteur(brad_pitt).
 pape(pape_francois).
 jesus(jesus).
 moise(moise).
 professeur_fact(michel_dagenais,sip).
 professeur_fact(michel_gagnon,ia).
-tennis(rafael_nadal,homme).
-tennis(eugenie_bouchard,femme).
-pilote(jacques_villeneuve,homme).
-presentatrice(julie_snyder).
-gouverne(stephen_harper,canada,homme).
-gouverne(barack_obama,usa,homme).
-gouverne(cleopatre,egypte,femme).
+tennis(rafael_nadal).
+tennis(eugenie_bouchard).
+pilote(jacques_villeneuve).
+presentateur(julie_snyder).
+gouverne(stephen_harper,canada).
+gouverne(barack_obama,usa).
+gouverne(cleopatre,egypte).
 pays(canada).
 pays(usa).
 pays(egypte).
