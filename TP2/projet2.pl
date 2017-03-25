@@ -392,7 +392,7 @@ printLine(Line, LineConstraints, MaxLines):-
     printLine(Line, LineConstraints, MaxLinesAux).
 
 printLine(Line, [FirstConstraint|NextConstraints], MaxLines):-
-    format('~16r', FirstConstraint), write(' '), 
+    format('~36r', FirstConstraint), write(' '), 
     MaxLinesAux is MaxLines - 1, 
     printLine(Line, NextConstraints, MaxLinesAux).
 
