@@ -1,5 +1,4 @@
 import theano
-import theano.tensor as T
 import numpy as np
 
 class LogisticRegression(object):
@@ -17,18 +16,16 @@ class LogisticRegression(object):
             borrow=True
         )
         #TODO
-        self.p_y_given_x = 0
+        self.p_y_given_x = theano.tensor.nnet.softmax(theano.tensor.dot(input, self.W) + self.b)
         #calcul de l'output
-        self.y_pred = 0
-        self.params = []
-        self.input = 0
+        self.y_pred = theano.tensor.argmax(self.p_y_given_x, axis=1)
+        self.params = [self.W, self.b]
+        self.input = input
 
     #calcul de la NLL
     def loss(self, y):
-        #TODO
-        return 0
+        return -theano.tensor.sum(theano.tensor.log(self.p_y_given_x)[theano.tensor.arange(y.shape[0]), y])
 
     #calcul de l'erreur
     def errors(self, y):
-        #TODO
-        return 0
+        return theano.tensor.mean(theano.tensor.neq(self.y_pred, y))

@@ -3,11 +3,20 @@ import numpy as np
 import theano.tensor as T
 
 def load_data():
-    #TODO : load the data set and so it can be easily used
-    #use np.load to load the data
-    dataset = ''
+    # load the data set
+    dataset = (np.load("./data/dataX.npy"), np.load("./data/dataY.npy"))
 
-    train_set, valid_set, test_set = (0,0,0)
+    # Separation : Train=50%, Test=Validation=25%
+    data_x, data_y = dataset
+    size_x, size_y = len(data_x), len(data_y)
+    purcentage_train = 0.5
+    purcentage_test = 0.25
+    i_end_train = int(size_x * purcentage_train)
+    i_end_test = int(size_x * (purcentage_train + purcentage_test))
+
+    train_set = (data_x[:i_end_train], data_y[:i_end_train])
+    test_set = (data_x[i_end_train:i_end_test], data_y[i_end_train:i_end_test])
+    valid_set = (data_x[i_end_test:], data_y[i_end_test:])
 
     print('... loading data')
 
