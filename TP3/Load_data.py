@@ -8,17 +8,19 @@ def load_data():
     dataX = np.load("data/dataX.npy")   # images
     dataY = np.load("data/dataY.npy")  # labels
 
+    size = len(dataX)
+
     # Shuffle data
     random_permutation = np.random.permutation(size)
-    dataX_shuffled = [dataX[i] for i in random_permutation]
-    dataY_shuffled = [dataY[i] for i in random_permutation]
+    dataX_shuffled = dataX[random_permutation]
+    dataY_shuffled = dataY[random_permutation]
 
     dataX = dataX_shuffled
     dataY = dataY_shuffled
 
     # Data separtion
-    train_purcentage = 0.5
-    test_purcentage = 0.25
+    train_purcentage = 0.80
+    test_purcentage = 0.10
 
     indice_train = int(size*train_purcentage)
     indice_test = int(size * (train_purcentage + test_purcentage))

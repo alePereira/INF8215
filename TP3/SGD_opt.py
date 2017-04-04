@@ -63,7 +63,8 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
     epoch = 0
     min_loss = 1
     n_without_improvement = 0
-    threshold_without_improvement = 50
+    threshold_without_improvement = 100
+    errors = []
 
     while epoch < n_epochs:
         epoch = epoch + 1
@@ -74,6 +75,7 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
         validation_state = [validate_model(i) for i in range(n_valid_batches)]
         #print(validation_state)
         validation_loss = np.mean(validation_state)
+        errors.append(validation_loss)
         print("Epoch n°" + str(epoch) + " Erreur de validation: " + str(validation_loss*100) + "%")
 
         if(min_loss > validation_loss):
@@ -91,10 +93,33 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
     print("Fin de l'entrainement avec " + str(epoch) + " epochs. Erreur finale sur l'ensemble de test: " + str(test_loss*100) + "%")
 
     #TODO : plot with matplotlib the train NLL and the error on test for each minibatch/epoch
+    # Plot de l'évolution du taux d'erreur et aussi la matrice de poids (rouge noir = poids négatif ; blanc = poids positif)
+    import matplotlib
+    import matplotlib.pyplot as plt
+
+    test_error_line = [test_loss] * epoch
+
+    ax_error = plt.subplot2grid((2,10), (0,0), colspan=5, rowspan=2)
+    ax_error.plot(errors)
+    ax_error.plot(test_error_line, 'r--')
+    ax_error.set_title("learning_rate = " + str(learning_rate))
+
+    aux = np.array([[value[i] for value in logreg.W.get_value()] for i in range(10)])
+
+    titles = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa']
+
+    for i in range(2):
+        for j in range(5):
+            axs = plt.subplot2grid((2,10), (i,j+5))
+            axs.imshow(aux[i*5+j].reshape((32,32)),cmap=matplotlib.cm.hot)
+            axs.axis('off')
+            axs.set_title(titles[i*5+j])
+
+    plt.show()
 
 
 if __name__ == '__main__':
     n_epochs=1000
-    batch_size=300
-    learning_rate=0.001
+    batch_size=200
+    learning_rate=0.00005
     sgd_optimization(learning_rate=learning_rate, n_epochs=n_epochs, batch_size=batch_size)
