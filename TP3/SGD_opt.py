@@ -61,6 +61,10 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
     )
     #TODO : 1.3.2
     epoch = 0
+    min_loss = 1
+    n_without_improvement = 0
+    threshold_without_improvement = 50
+
     while epoch < n_epochs:
         epoch = epoch + 1
         for minibatch_index in range(n_train_batches):
@@ -71,6 +75,16 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
         #print(validation_state)
         validation_loss = np.mean(validation_state)
         print("Epoch n°" + str(epoch) + " Erreur de validation: " + str(validation_loss*100) + "%")
+
+        if(min_loss > validation_loss):
+            min_loss = validation_loss
+            n_without_improvement = 0
+        else:
+            n_without_improvement += 1
+
+        if(n_without_improvement > threshold_without_improvement):
+            break
+
     
     test_state = [test_model(i) for i in range(n_test_batches)]
     test_loss = np.mean(test_state)
@@ -80,7 +94,7 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
 
 
 if __name__ == '__main__':
-    n_epochs=100
+    n_epochs=1000
     batch_size=300
-    learning_rate=0.5
+    learning_rate=0.001
     sgd_optimization(learning_rate=learning_rate, n_epochs=n_epochs, batch_size=batch_size)
