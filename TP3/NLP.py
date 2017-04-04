@@ -17,7 +17,7 @@ def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1):
     n_valid_batches = valid_x.get_value(borrow=True).shape[0] // batch_size
     n_test_batches = test_x.get_value(borrow=True).shape[0] // batch_size
 
-    n_in = 28 * 28
+    n_in = 32 * 32
     n_out = 10
 
     index = T.lscalar()
@@ -115,3 +115,11 @@ def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1):
     plt.plot(range(0, len(valErr)), valErr)
     plt.plot(testind, testErr)
     plt.show()
+
+if __name__ == '__main__':
+    n_epochs = 1000
+    n_hidden = 16*16
+    batch_size = 200
+    learning_rate = 0.001
+    L2_reg = 0.1
+    test_mlp(learning_rate=learning_rate, n_epochs=n_epochs, batch_size=batch_size, L2_reg = L2_reg, n_hidden1=n_hidden)

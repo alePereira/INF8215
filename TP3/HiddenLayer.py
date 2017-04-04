@@ -11,6 +11,6 @@ class HiddenLayer(object):
         self.W = theano.shared(value=W_values, name='Wh', borrow=True)
         b_values = np.zeros((n_out,), dtype=theano.config.floatX)
         self.b = theano.shared(value=b_values, name='bh', borrow=True)
-        self.input = 0
-        self.output = 0
-        self.params = []
+        self.input = input
+        self.output = theano.tensor.nnet.relu(theano.tensor.dot(input, self.W) + self.b)
+        self.params = [self.W, self.b]
