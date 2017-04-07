@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 
 def sgd_optimization(learning_rate=0.13, n_epochs=1000,
-                           batch_size=300):
+                           batch_size=300, id=0, print_debug = True):
     datasets = Load_data.load_data()
 
     train_set_x, train_set_y = datasets[0]
@@ -63,7 +63,7 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
     epoch = 0
     min_loss = 1
     n_without_improvement = 0
-    threshold_without_improvement = 100
+    threshold_without_improvement = 75
     errors = []
 
     while epoch < n_epochs:
@@ -76,7 +76,8 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
         #print(validation_state)
         validation_loss = np.mean(validation_state)
         errors.append(validation_loss)
-        print("Epoch n°" + str(epoch) + " Erreur de validation: " + str(validation_loss*100) + "%")
+        if print_debug:
+            print("Epoch n°" + str(epoch) + " Erreur de validation: " + str(validation_loss*100) + "%")
 
         if(min_loss > validation_loss):
             min_loss = validation_loss
@@ -90,12 +91,15 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
     
     test_state = [test_model(i) for i in range(n_test_batches)]
     test_loss = np.mean(test_state)
-    print("Fin de l'entrainement avec " + str(epoch) + " epochs. Erreur finale sur l'ensemble de test: " + str(test_loss*100) + "%")
+    if print_debug:
+        print("Fin de l'entrainement avec " + str(epoch) + " epochs. Erreur finale sur l'ensemble de test: " + str(test_loss*100) + "%")
 
     #TODO : plot with matplotlib the train NLL and the error on test for each minibatch/epoch
     # Plot de l'évolution du taux d'erreur et aussi la matrice de poids (rouge noir = poids négatif ; blanc = poids positif)
     import matplotlib
     import matplotlib.pyplot as plt
+
+    plt.clf()
 
     test_error_line = [test_loss] * epoch
 
@@ -116,10 +120,11 @@ def sgd_optimization(learning_rate=0.13, n_epochs=1000,
             axs.set_title(titles[i*5+j])
 
     plt.show()
+    #plt.savefig("plot/LinReg_lr_" + str(learning_rate) + "_bs_" + str(batch_size) + "_" + str(id) + ".png")
 
 
 if __name__ == '__main__':
     n_epochs=1000
     batch_size=200
-    learning_rate=0.00005
+    learning_rate=.0005
     sgd_optimization(learning_rate=learning_rate, n_epochs=n_epochs, batch_size=batch_size)
