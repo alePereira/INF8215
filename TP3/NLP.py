@@ -5,7 +5,7 @@ import NeuralNet
 import numpy as np
 import matplotlib.pyplot as plt
 
-def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1):
+def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1, n_hidden2, print_debug = True):
     datasets = Load_data.load_data()
 
     train_x, train_y = datasets[0]
@@ -24,7 +24,7 @@ def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1):
     x = T.matrix('x')
     y = T.ivector('y')
 
-    NNet = NeuralNet.NN(x, n_in, n_hidden1, n_out, batch_size)
+    NNet = NeuralNet.NN(x, n_in, n_hidden1, n_hidden2, n_out, batch_size)
     cost = NNet.NLL(y) + L2_reg * NNet.L2
 
     test_model = theano.function(
@@ -70,7 +70,8 @@ def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1):
     testErr = []
     testind = []
 
-    print('training....')
+    if(print_debug):
+        print('training....')
 
     while ((not done_looping) and (epoch < n_epochs)):
         epoch = epoch + 1
@@ -79,9 +80,10 @@ def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1):
 
         validation_losses = [validate_model(i) for i in range(n_valid_batches)]
         this_validation_loss = np.mean(validation_losses)
-        print('epoch %i, validation error %f %%' %
-              (epoch, this_validation_loss * 100.)
-              )
+        if print_debug:
+            print('epoch %i, validation error %f %%' %
+                  (epoch, this_validation_loss * 100.)
+                  )
         # valErr.append(this_validation_loss)
         if this_validation_loss < best_validation_loss:
             best_validation_loss = this_validation_loss
@@ -89,8 +91,9 @@ def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1):
             test_losses = [test_model(i) for i in range(n_test_batches)]
             test_score = np.mean(test_losses)
 
-            print(('     epoch %i, test error of best model %f %%') %
-                  (epoch, test_score * 100.))
+            if print_debug:
+                print(('     epoch %i, test error of best model %f %%') %
+                      (epoch, test_score * 100.))
             testErr.append(test_score)
             testind.append(epoch)
         if (err - this_validation_loss < thr):
@@ -109,17 +112,22 @@ def test_mlp(learning_rate, L2_reg, n_epochs, batch_size, n_hidden1):
     #              (epoch, test_score * 100.))
     testErr.append(test_score)
     testind.append(epoch)
-    print(('Optimization complete. Best validation score of %f %% '
-           ' with test performance %f %%') %
-          (best_validation_loss * 100., test_score * 100.))
-    plt.plot(range(0, len(valErr)), valErr)
-    plt.plot(testind, testErr)
-    plt.show()
+    if print_debug:
+        print(('Optimization complete. Best validation score of %f %% '
+               ' with test performance %f %%') %
+              (best_validation_loss * 100., test_score * 100.))
+        plt.plot(range(0, len(valErr)), valErr)
+        plt.plot(testind, testErr)
+        plt.show()
+
+    return best_validation_loss
 
 if __name__ == '__main__':
     n_epochs = 1000
-    n_hidden = 16*16
-    batch_size = 200
-    learning_rate = 0.001
+    n_hidden1 = 16*16
+    n_hidden2 = 16*8
+    #n_hidden2 = 0
+    batch_size = 100
+    learning_rate = 0.0001
     L2_reg = 0.1
-    test_mlp(learning_rate=learning_rate, n_epochs=n_epochs, batch_size=batch_size, L2_reg = L2_reg, n_hidden1=n_hidden)
+    test_mlp(learning_rate=learning_rate, n_epochs=n_epochs, batch_size=batch_size, L2_reg = L2_reg, n_hidden1=n_hidden1, n_hidden2=n_hidden2)

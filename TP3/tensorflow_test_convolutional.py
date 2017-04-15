@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import random
 
 # Load data
 dataX = np.load("data/dataX.npy")   # images
@@ -11,20 +12,29 @@ for i in range(len(dataY)):
 
 dataY = formated
 
+def shuffle_data(dataX, dataY):
+    random_permutation = np.random.permutation(len(dataX))
+    return (dataX[random_permutation], dataY[random_permutation])
+
+dataX, dataY = shuffle_data(dataX, dataY)
+
 # Data separtion
-train_purcentage = 0.5
+train_purcentage = 0.8
+test_purcentage = 0.1
 size = len(dataX)
 indice = int(size*train_purcentage)
+indice_test = int(size * (train_purcentage + test_purcentage))
 train_data = (dataX[:indice], dataY[:indice])
-test_data = (dataX[indice:], dataY[indice:])
+test_data = (dataX[indice:indice_test], dataY[indice:indice_test])
+valid_data = (dataX[indice_test:], dataY[indice_test:])
 
 #print(test_data)
 
 # Constants
-learning_rate = 0.001
+learning_rate = 0.0001
 batch_size = 300
 n_iterations = len(train_data[0]) // batch_size
-n_epochs = 50
+n_epochs = 1000
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev=0.1)
@@ -82,11 +92,41 @@ sess.run(tf.global_variables_initializer())
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_,1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+n_without_improvement = 0
+threshold_without_improvement = 50
+max_accuracy = 0
+accuracies = []
+
 # Train part
 for n in range(n_epochs):
+    #Shuffle train data
+    train_data = shuffle_data(train_data[0], train_data[1])
     for i in range(n_iterations):
         data_xs, data_ys = train_data[0][i*batch_size:(i+1)*batch_size], train_data[1][i*batch_size:(i+1)*batch_size]
         sess.run(train_step, feed_dict={x:data_xs, y_:data_ys, keep_prob: 0.5})
 
-    train_accuracy = accuracy.eval(feed_dict={x:test_data[0], y_: test_data[1], keep_prob: 1.0})
-    print("Epoch n°" + str(n+1) + "; Accuracy=", train_accuracy)
+    train_accuracy = accuracy.eval(feed_dict={x:valid_data[0], y_: valid_data[1], keep_prob: 1.0})
+    print("Epoch n°" + str(n+1) + "; Accuracy=", train_accuracy*100, "%")
+    accuracies.append(train_accuracy)
+
+    if(train_accuracy > max_accuracy):
+        max_accuracy = train_accuracy
+        n_without_improvement = 0
+        test_accuracy = accuracy.eval(feed_dict={x:test_data[0], y_: test_data[1], keep_prob: 1.0})
+        print("\tBetter accuracy... Test Accuracy=", test_accuracy * 100, "%")
+
+    if(n_without_improvement > threshold_without_improvement):
+        break
+    else:
+        n_without_improvement += 1
+
+test_accuracy = accuracy.eval(feed_dict={x:test_data[0], y_: test_data[1], keep_prob: 1.0})
+print("Training's over... Test Accuracy=", test_accuracy * 100, "%")
+
+import matplotlib
+import matplotlib.pyplot as plt
+
+
+plt.plot(accuracies)
+
+plt.show()
