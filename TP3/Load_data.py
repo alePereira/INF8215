@@ -28,7 +28,7 @@ def load_data():
     test_set = (dataX[indice_train:indice_test], dataY[indice_train:indice_test])
     valid_set = (dataX[indice_test:], dataY[indice_test:])
 
-    #print('... loading data')
+    print('... loading data')
 
     def shared_dataset(data_xy, borrow=True):
         data_x, data_y = data_xy

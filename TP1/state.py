@@ -24,9 +24,9 @@ class State(object):
         if(self.rh is None or self.rh.solveType <= 1):
             self.f = 1
         elif(self.rh.solveType == 2):
-            self.f = self.estimee1()
+            self.f = self.estimee1() + self.n
         else:
-            self.f = self.estimee2()
+            self.f = self.estimee2() + self.n
 
     def success(self):
         return self.pos[0] == 4

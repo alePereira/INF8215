@@ -189,7 +189,7 @@ def solveAstar():
     rh.moveOn = [ 2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5 ]
     s = State(p=[ 1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 1 ], rhInstance=rh)
     s = rh.solveAstar(s)
-    rh.printSolution(s)
+    rh.printAnimatedAsciiSolution(s)
 
 # Test code
 if __name__ == '__main__':
